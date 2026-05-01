@@ -4,10 +4,16 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private GridManager gridManager;
     [SerializeField] private Transform highlight; // 光るオブジェクト
+    [Tooltip("タワーのprefab"), SerializeField] public GameObject _towerPrefab;
 
     void Update()
     {
         HighlightCellUnderMouse();
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            PlaceTower();
+        }
     }
 
     void HighlightCellUnderMouse()
@@ -31,5 +37,10 @@ public class Player : MonoBehaviour
 
             highlight.position = worldPos;
         }
+    }
+
+    private void PlaceTower()
+    {
+
     }
 }
