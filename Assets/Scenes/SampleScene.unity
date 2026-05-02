@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.27059805, y: -0.6532815, z: 0.27059805, w: 0.6532815}
-  m_LocalPosition: {x: 50, y: 20, z: 25}
+  m_LocalPosition: {x: 20, y: 10, z: 9.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -565,9 +565,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbd7359295fcfe54e850a216e9071c3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _width: 8
-  _height: 10
-  _cellSize: 5
+  _width: 15
+  _height: 20
+  _cellSize: 1
 --- !u!4 &887674380
 Transform:
   m_ObjectHideFlags: 0
@@ -597,6 +597,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridManager: {fileID: 887674379}
   highlight: {fileID: 1949351037}
+  _towerPrefab: {fileID: 2707662066573525250, guid: a7afdff5902f8684ba4769218b8f9bb7, type: 3}
 --- !u!1001 &1949351036
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -5,7 +5,6 @@ public class GridManager : MonoBehaviour
     [Tooltip("グリットの横幅"), SerializeField] public int _width;
     [Tooltip("グリットの縦幅"), SerializeField] public int _height;
     [Tooltip("グリットのサイズ"), SerializeField] public float _cellSize;
-    [Tooltip("タワーのprefab"), SerializeField] public GameObject _towerPrefab;
 
     private GridCell[,] _gridCell;
 
