@@ -45,7 +45,8 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < _height; y++)
             {
-                _gridCell[x, y] = new GridCell { GritPos = new Vector2Int(x, y), CanBuild = true };
+                //今は全部Ground判定になってる
+                _gridCell[x, y] = new GridCell { GritPos = new Vector2Int(x, y), CellType = CellType.Ground };
             }
 
         }

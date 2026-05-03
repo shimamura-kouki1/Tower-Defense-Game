@@ -5,6 +5,7 @@ public class Player : MonoBehaviour
     [SerializeField] private GridManager gridManager;
     [SerializeField] private Transform highlight; // 光るオブジェクト
     [Tooltip("タワーのprefab"), SerializeField] public GameObject _towerPrefab;
+    [SerializeField] private UnitType _curentUnitType;
 
     void Update()
     {
@@ -50,7 +51,7 @@ public class Player : MonoBehaviour
             var cell = gridManager.GetCell(gridPos);
             if (cell == null) return;
 
-            if (!cell.CanBuild || cell.BuildObject != null)
+            if (!cell.CanPlace(_curentUnitType))
             {
                 Debug.Log("置けない");
                 return;
@@ -65,4 +66,6 @@ public class Player : MonoBehaviour
             cell.BuildObject = tower;
         }
     }
+
+
 }
