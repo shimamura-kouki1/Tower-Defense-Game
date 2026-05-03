@@ -45,7 +45,7 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < _height; y++)
             {
-                //今は全部Ground判定になってる
+                //今はグラウンド判定しかない状態
                 _gridCell[x, y] = new GridCell { GritPos = new Vector2Int(x, y), CellType = CellType.Ground };
             }
 
@@ -55,22 +55,54 @@ public class GridManager : MonoBehaviour
     //ギズモ表示
     private void OnDrawGizmos()
     {
+        if (_gridCell == null) return;
+
+        for (int x = 0; x < _width; x++)
+        {
+            for (int y = 0; y < _height; y++)
+            {
+                var cell = _gridCell[x, y];
+                if (cell == null) continue;
+
+                // 色分け
+                switch (cell.CellType)
+                {
+                    case CellType.Ground:
+                        Gizmos.color = Color.green;
+                        break;
+
+                    case CellType.HighGround:
+                        Gizmos.color = Color.blue;
+                        break;
+                }
+
+                // マスの中心
+                Vector3 center = new Vector3(
+                    x * _cellSize + _cellSize / 2f,
+                    0,
+                    y * _cellSize + _cellSize / 2f
+                );
+
+                // 小さい立方体で表示
+                Gizmos.DrawCube(center, new Vector3(_cellSize, 0.01f, _cellSize));
+
+                // 中心点（デバッグ用）
+                Gizmos.color = Color.black;
+                Gizmos.DrawSphere(center, 0.05f);
+            }
+        }
+
         Gizmos.color = Color.green;
-
-
         for (int x = 0; x <= _width; x++)
         {
             Vector3 start = new Vector3(x * _cellSize, 0, 0);
             Vector3 end = new Vector3(x * _cellSize, 0, _height * _cellSize);
-
             Gizmos.DrawLine(start, end);
         }
-
         for (int y = 0; y <= _height; y++)
         {
             Vector3 start = new Vector3(0, 0, y * _cellSize);
             Vector3 end = new Vector3(_width * _cellSize, 0, y * _cellSize);
-
             Gizmos.DrawLine(start, end);
         }
     }

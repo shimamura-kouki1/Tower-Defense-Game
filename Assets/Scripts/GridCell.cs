@@ -27,7 +27,7 @@ public class GridCell
             case CellType.Ground:
                 return unitType == UnitType.Melee;
 
-            case CellType.HightGround:
+            case CellType.HighGround:
                 return unitType == UnitType.Ranged;
 
             default: return false;
@@ -38,5 +38,5 @@ public class GridCell
 public enum CellType
 {
     Ground,
-    HightGround
+    HighGround
 }
