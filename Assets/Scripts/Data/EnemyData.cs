@@ -2,6 +2,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Enemy/EnemyData")]
 public class EnemyData : ScriptableObject
 {
+    [Header("Prefab")]
+    public Enemy Prefab;
+
     [Header("Base")]
     public string EnemyName;
 
