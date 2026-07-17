@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f3696b5953eb724dbadd58b2318986a, type: 3}
   m_Name: New Enemy Data
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 0}
+  Prefab: {fileID: 8459847224661157250, guid: 2aca57f0262efd742a2fe1bb450257f9, type: 3}
   EnemyName: Mele
   MaxHP: 100
   MoveSpeed: 2

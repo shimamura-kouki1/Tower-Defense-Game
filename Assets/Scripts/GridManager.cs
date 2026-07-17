@@ -33,11 +33,11 @@ public class GridManager : MonoBehaviour
 
     private void Awake()
     {
-        Creatgrid();
+        CreatGrid();
     }
 
     //グリットの配置（生成）
-    private void Creatgrid()
+    private void CreatGrid()
     {
         _gridCell = new GridCell[_width, _height];
 

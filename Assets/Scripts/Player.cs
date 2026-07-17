@@ -66,6 +66,4 @@ public class Player : MonoBehaviour
             cell.BuildObject = tower;
         }
     }
-
-
 }
