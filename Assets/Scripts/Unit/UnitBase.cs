@@ -1,15 +1,22 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitBase : MonoBehaviour
+public class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
 {
+
     [SerializeField] protected UnitData _unitData;
+    [SerializeField] protected GridDirection _facing = GridDirection.Up;
 
     protected float _currentHP;
     protected float _coolDownTimer;
     protected Transform _currentTarget;
+    protected Vector2Int _gridPosition;
+
+    private HashSet<Vector2Int> _rotatedPatternCache;
+    private GridDirection _cachedFacing;
 
     public bool IsDead { get; private set; }
-
+    public Vector2Int GridPosition => _gridPosition;
 
     protected virtual void Awake()
     {
@@ -45,7 +52,7 @@ public class UnitBase : MonoBehaviour
 
     public virtual void Init()
     {
-        if (_unitData != null) _currentHP = _unitData._maxHP;
+        if (_unitData != null) _currentHP = _unitData.maxHP;
     }
 
     //Enemyの索敵
