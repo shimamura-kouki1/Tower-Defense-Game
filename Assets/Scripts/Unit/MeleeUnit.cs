@@ -1,16 +1,12 @@
 using UnityEngine;
 
-public class MeleeUnit : MonoBehaviour
+public class MeleeUnit : UnitBase
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected override void Attack(Transform target)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Debug.Log("攻撃");
+        var damageable = target.GetComponent<IDamageable>();
+        damageable?.TakeDamage(_unitData.attackPower);
+        // TODO: 攻撃モーション・エフェクトはここに追加
     }
 }

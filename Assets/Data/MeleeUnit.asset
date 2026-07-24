@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09f1887844740c341a44d67b76e2c2de, type: 3}
-  m_Name: sword
+  m_Name: MeleeUnit
   m_EditorClassIdentifier: 
-  unitName: New Unit
-  prefab: {fileID: 0}
+  unitName: MeleeUnit
+  prefab: {fileID: 370375985335088288, guid: c5142a9cd9feef04fb5f6009e724f3ba, type: 3}
   unitType: 0
   unitCost: 0
-  maxHP: 0
-  defense: 0
-  attackPower: 0
+  maxHP: 100
+  defense: 20
+  attackPower: 20
   attackInterval: 1
-  _attackSpeed: 0
+  _attackSpeed: 1
   attackPattern:
-  - {x: 0, y: 0}
+  - {x: 0, y: 1}
   projectilePrefab: {fileID: 0}
