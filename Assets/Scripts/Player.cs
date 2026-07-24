@@ -4,8 +4,9 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private GridManager gridManager;
     [SerializeField] private Transform highlight; // 光るオブジェクト
-    [Tooltip("タワーのprefab"), SerializeField] public GameObject _towerPrefab;
-    [SerializeField] private UnitType _curentUnitType;
+    [Tooltip("タワーのprefab"), SerializeField] public UnitData _unitPrefab;
+    [SerializeField] private UnitType _currentUnitType;
+    [SerializeField] private DPManager _dPManager;
 
     void Update()
     {
@@ -49,9 +50,13 @@ public class Player : MonoBehaviour
         {
             Vector2Int gridPos = gridManager.WorldToGrid(hit.point);
             var cell = gridManager.GetCell(gridPos);
-            if (cell == null) return;
 
-            if (!cell.CanPlace(_curentUnitType))
+            if (!_dPManager.Consume(_unitPrefab.unitCost))
+            {
+                return;
+            }
+
+            if (!cell.CanPlace(_currentUnitType))
             {
                 Debug.Log("置けない");
                 return;
@@ -61,9 +66,9 @@ public class Player : MonoBehaviour
 
             wolrdPos += new Vector3(gridManager._cellSize / 2f, 0.01f, gridManager._cellSize / 2f);
 
-            GameObject tower = Instantiate(_towerPrefab, wolrdPos, Quaternion.identity);
+            UnitBase tower = Instantiate(_unitPrefab.prefab, wolrdPos, Quaternion.identity);
 
-            cell.BuildObject = tower;
+            cell.BuildObject = tower.gameObject;
         }
     }
 }
