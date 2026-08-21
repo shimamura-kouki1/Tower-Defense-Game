@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Unit/UnitData")]
@@ -14,6 +13,13 @@ public class UnitData : ScriptableObject
     [SerializeField] public int unitCost;
     [SerializeField] public float maxHP;
     [SerializeField] public float defense;
+
+    [Header("強制退却・再配置")]
+    [Tooltip("再配置コストの倍率。1.0=同じ、1.5=1.5倍。ユニットごとに調整可能")]
+    [SerializeField, Range(1.0f, 5.0f)] public float redeployCostMultiplier = 1.5f;
+
+    [Tooltip("強制退却してから再配置可能になるまでの秒数")]
+    [SerializeField] public float retreatCooldown = 15f;
 
     [Header("戦闘性能")]
     [SerializeField] public float attackPower;
@@ -34,6 +40,12 @@ public class UnitData : ScriptableObject
 
     [Header("拡張用（遠距離ユニットなどで使用）")]
     public GameObject projectilePrefab;
+
+    /// <summary>再配置時に実際に消費するDPコスト(端数切り上げ)</summary>
+    public int GetRedeployCost()
+    {
+        return Mathf.CeilToInt(unitCost * redeployCostMultiplier);
+    }
 
     //[SerializeField] public int _coolDown;
 

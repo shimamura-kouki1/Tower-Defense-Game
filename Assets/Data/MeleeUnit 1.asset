@@ -10,19 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09f1887844740c341a44d67b76e2c2de, type: 3}
-  m_Name: MeleeUnit
+  m_Name: MeleeUnit 1
   m_EditorClassIdentifier: 
   unitName: MeleeUnit
-  prefab: {fileID: 370375985335088288, guid: c5142a9cd9feef04fb5f6009e724f3ba, type: 3}
+  prefab: {fileID: 370375985335088288, guid: 92226b79205eb95429340090862a5a8f, type: 3}
   unitType: 0
   unitCost: 0
   maxHP: 100
   defense: 20
   redeployCostMultiplier: 1.5
   retreatCooldown: 15
-  attackPower: 20
+  attackPower: 40
   attackInterval: 1
   _attackSpeed: 1
   attackPattern:
   - {x: 0, y: 1}
+  - {x: 0, y: 2}
   projectilePrefab: {fileID: 0}

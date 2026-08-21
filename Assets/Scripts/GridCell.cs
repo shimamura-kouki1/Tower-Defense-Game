@@ -8,6 +8,12 @@ public class GridCell
     public GameObject BuildObject;//何がグリットに配置されているか
 
     /// <summary>
+    /// このセルに配置されているUnitBase本体への参照。
+    /// 強制退却時にセルを解放するために使う(Player側から設定)。
+    /// </summary>
+    public UnitBase OccupyingUnit;
+
+    /// <summary>
     /// 敵が通れるか
     /// </summary>
     public bool CanEnemyPass
@@ -32,6 +38,15 @@ public class GridCell
 
             default: return false;
         }
+    }
+
+    /// <summary>
+    /// 配置されていたユニットが強制退却した際に呼ぶ。BuildObjectとOccupyingUnitを両方クリアする。
+    /// </summary>
+    public void Clear()
+    {
+        BuildObject = null;
+        OccupyingUnit = null;
     }
 }
 

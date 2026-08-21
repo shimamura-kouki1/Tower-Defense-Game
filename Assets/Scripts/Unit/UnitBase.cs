@@ -1,14 +1,28 @@
 using System;
 using UnityEngine;
 
-public abstract class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
+/// <summary>
+/// ユニットの状態。
+///   Deployed      : 配置済み・戦闘参加中(被弾でHP減少)
+///   ForcedRetreat : HP0による強制退却(演出用の一瞬の状態)
+///   Cooldown      : 再配置不可・タイマー進行中
+///   Redeployable  : クールダウン明け、再配置可能
+/// </summary>
+public enum UnitState
 {
+    Deployed,
+    ForcedRetreat,
+    Cooldown,
+    Redeployable
+}
 
+public abstract class UnitBase : MonoBehaviour, IGridPositioned, IDamageable
+{
     [SerializeField] protected UnitData _unitData;
     [SerializeField] protected GridDirection _facing = GridDirection.Up;
 
     protected float _currentHP;
-    protected float _coolDownTimer;
+    protected float _coolDownTimer; // 攻撃のクールダウン(既存)
     protected Transform _currentTarget;
     protected Vector2Int _gridPosition;
 
@@ -18,8 +32,19 @@ public abstract class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
     private GridDirection _cachedFacing;
     private bool _patternComputed;
 
-    public bool IsDead { get; private set; }
+    // ---- 強制退却・クールダウン関連 ----
+    private float _retreatCooldownTimer; // 退却クールダウン(攻撃クールダウンとは別物)
+
+    public bool IsDead { get; protected set; }
     public Vector2Int GridPosition => _gridPosition;
+
+    public UnitState State { get; private set; } = UnitState.Deployed;
+
+    /// <summary>状態が変化した時に発火。UI(布陣の穴の表示等)やアニメ制御用</summary>
+    public event Action<UnitState> OnStateChanged;
+
+    /// <summary>強制退却が発生した瞬間に発火(演出トリガー用)</summary>
+    public event Action OnForcedRetreat;
 
     protected virtual void Awake()
     {
@@ -28,6 +53,18 @@ public abstract class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
 
     protected virtual void Update()
     {
+        // 退却中・クールダウン中は戦闘ロジックを止める
+        if (State == UnitState.Cooldown)
+        {
+            _retreatCooldownTimer -= Time.deltaTime;
+            if (_retreatCooldownTimer <= 0f)
+            {
+                SetState(UnitState.Redeployable);
+            }
+            return;
+        }
+
+        if (State != UnitState.Deployed) return;
         if (IsDead || _unitData == null) return;
 
         _coolDownTimer -= Time.deltaTime;
@@ -49,13 +86,47 @@ public abstract class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
     /// <summary>攻撃の中身は各ユニットで実装する（近接・遠距離・範囲攻撃など）</summary>
     protected abstract void Attack(Transform target);
 
-    /// <summary>グリッド配置システムから、設置完了時に呼んでもらう想定のフック</summary>
+    /// <summary>
+    /// 初回配置を試みる。DP消費が成功したらtrue。
+    /// Player側でInstantiate直後に呼ぶ想定。
+    /// </summary>
+    public virtual bool TryDeploy(DPManager dp)
+    {
+        if (_unitData == null) return false;
+        if (!dp.Consume(_unitData.unitCost)) return false;
+
+        _currentHP = _unitData.maxHP;
+        IsDead = false;
+        SetState(UnitState.Deployed);
+        return true;
+    }
+
+    /// <summary>
+    /// 再配置を試みる。Redeployable状態からのみ呼べる。
+    /// ユニットごとの倍率コストが適用される。
+    /// 成功したら見た目を復帰させる処理も呼び出し側(Player)で行うこと。
+    /// </summary>
+    public virtual bool TryRedeploy(DPManager dp, Vector2Int newGridPosition, GridDirection facing = GridDirection.Up)
+    {
+        if (State != UnitState.Redeployable) return false;
+        if (_unitData == null) return false;
+
+        int cost = _unitData.GetRedeployCost();
+        if (!dp.Consume(cost)) return false;
+
+        _currentHP = _unitData.maxHP; // 全回復の仕様
+        IsDead = false;
+        OnPlaced(newGridPosition, facing);
+        SetState(UnitState.Deployed);
+        return true;
+    }
+
+    /// <summary>グリッド配置システムから、設置(または再配置)完了時に呼んでもらう想定のフック</summary>
     public virtual void OnPlaced(Vector2Int gridPosition, GridDirection facing = GridDirection.Up)
     {
         _patternComputed = false;
         _gridPosition = gridPosition;
         _facing = facing;
-        // フェーズA 2週目：ここでDP消費・在庫チェックなどを追加予定
     }
 
     public virtual void Init()
@@ -91,8 +162,6 @@ public abstract class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
         return nearest;
     }
 
-
-
     /// <summary>対象が現在の攻撃パターン内に入っているか判定</summary>
     protected virtual bool IsTargetInRange(Transform target)
     {
@@ -116,14 +185,12 @@ public abstract class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
 
         int count = _unitData.attackPattern.Count;
 
-        // パターン数が変わった場合(データ差し替え等)だけ配列を作り直す
         if (_rotatedPatternBuffer == null || _rotatedPatternBuffer.Length != count)
         {
             _rotatedPatternBuffer = new Vector2Int[count];
             _patternComputed = false;
         }
 
-        // 向きが変わっていなければ再計算不要
         if (!_patternComputed || _cachedFacing != _facing)
         {
             for (int i = 0; i < count; i++)
@@ -154,23 +221,51 @@ public abstract class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
     /// <summary>
     /// ダメージ処理
     /// </summary>
-    /// <param name="amount"></param>
     public virtual void TakeDamage(float amount)
     {
         if (_unitData == null) return;
-        if (IsDead) return;
+        if (State != UnitState.Deployed) return; // 戦闘参加中のみ被弾する
 
         float actualDamage = Mathf.Max(0f, amount - _unitData.defense);
         _currentHP -= actualDamage;
 
-        if (_currentHP <= 0f) Die();
+        if (_currentHP <= 0f) ForceRetreat();
     }
 
-    protected virtual void Die()
+    /// <summary>
+    /// HP0による強制退却。即Destroyではなく、非表示化してクールダウンへ移行する。
+    /// </summary>
+    protected virtual void ForceRetreat()
     {
         IsDead = true;
-        // フェーズA 2週目：即Destroyではなく「強制退却」に分岐させる処理をここに追加予定
-        Destroy(gameObject);
+        SetState(UnitState.ForcedRetreat);
+        OnForcedRetreat?.Invoke();
+
+        // 見た目を消す(破壊はしない。再配置時に再利用する)
+        SetVisualActive(false);
+
+        // 退却演出は一瞬なので、即座にクールダウンへ。
+        // 演出時間を挟みたい場合はここをコルーチン化してdelayを入れる。
+        _retreatCooldownTimer = _unitData != null ? _unitData.retreatCooldown : 15f;
+        SetState(UnitState.Cooldown);
+    }
+
+    /// <summary>
+    /// 見た目・当たり判定の有効/無効を切り替える。
+    /// 退却中はレンダラーとコライダーを止めて、戦闘に一切関与しない状態にする。
+    /// </summary>
+    protected virtual void SetVisualActive(bool active)
+    {
+        foreach (var r in GetComponentsInChildren<Renderer>())
+            r.enabled = active;
+        foreach (var c in GetComponentsInChildren<Collider>())
+            c.enabled = active;
+    }
+
+    private void SetState(UnitState newState)
+    {
+        State = newState;
+        OnStateChanged?.Invoke(newState);
     }
 
     /// <summary>配置後に向きだけ変更したい場合に使う（回転砲台など）</summary>
@@ -192,11 +287,5 @@ public abstract class UnitBase : MonoBehaviour,IGridPositioned,IDamageable
             Vector3 worldOffset = new Vector3(rotated.x, 0f, rotated.y);
             Gizmos.DrawWireCube(transform.position + worldOffset, Vector3.one * 0.9f);
         }
-    }
-
-    //HPが減少する処理
-    public virtual void HPDecrease()
-    {
-        //TakeDamage();
     }
 }

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9161930512681823831}
   - component: {fileID: 370375985335088288}
   m_Layer: 0
-  m_Name: MeleeUnit
+  m_Name: MeleeUnit 1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -123,6 +123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 694228c15cf7e294db3c33200fdfc34e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _unitData: {fileID: 11400000, guid: 1ec9d3e0387160049b0d219d90d15c0c, type: 2}
+  _unitData: {fileID: 11400000, guid: 3e89b9785605f434c9195d1eb1e81ac1, type: 2}
   _facing: 0
   _rotatedPatternBuffer: []
