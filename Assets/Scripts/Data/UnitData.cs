@@ -13,9 +13,10 @@ public class UnitData : ScriptableObject
     [SerializeField] public int unitCost;
     [SerializeField] public float maxHP;
     [SerializeField] public float defense;
+    [SerializeField] public float MaxStamina;
 
     [Header("強制退却・再配置")]
-    [Tooltip("再配置コストの倍率。1.0=同じ、1.5=1.5倍。ユニットごとに調整可能")]
+    [Tooltip("再配置コストの倍率。1.0=同じ、1.5=1.5倍")]
     [SerializeField, Range(1.0f, 5.0f)] public float redeployCostMultiplier = 1.5f;
 
     [Tooltip("強制退却してから再配置可能になるまでの秒数")]

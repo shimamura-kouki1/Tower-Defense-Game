@@ -15,9 +15,10 @@ MonoBehaviour:
   unitName: MeleeUnit
   prefab: {fileID: 370375985335088288, guid: c5142a9cd9feef04fb5f6009e724f3ba, type: 3}
   unitType: 0
-  unitCost: 0
+  unitCost: 5
   maxHP: 100
   defense: 20
+  MaxStamina: 10
   redeployCostMultiplier: 1.5
   retreatCooldown: 15
   attackPower: 20

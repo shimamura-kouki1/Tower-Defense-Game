@@ -125,4 +125,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unitData: {fileID: 11400000, guid: 1ec9d3e0387160049b0d219d90d15c0c, type: 2}
   _facing: 0
+  _gameTimeManager: {fileID: 8248911867654359639, guid: 537da7e1804ccd343babceec395a22a2, type: 3}
   _rotatedPatternBuffer: []

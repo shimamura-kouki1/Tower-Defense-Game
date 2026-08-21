@@ -20,9 +20,14 @@ public abstract class UnitBase : MonoBehaviour, IGridPositioned, IDamageable
 {
     [SerializeField] protected UnitData _unitData;
     [SerializeField] protected GridDirection _facing = GridDirection.Up;
+    [SerializeField] private GameTimeManager _gameTimeManager;
 
     protected float _currentHP;
     protected float _coolDownTimer; // 攻撃のクールダウン(既存)
+    private float _staminaTimer; // スタミナのクールダウン
+    private float _currentStamina; // スタミナの現在値
+    private long _lastStaminaTick;
+    private int _staminaInterval = 60;
     protected Transform _currentTarget;
     protected Vector2Int _gridPosition;
 
@@ -67,6 +72,14 @@ public abstract class UnitBase : MonoBehaviour, IGridPositioned, IDamageable
         if (State != UnitState.Deployed) return;
         if (IsDead || _unitData == null) return;
 
+        TickAttackCooldown();
+
+      
+        TickStamina();
+    }
+
+    private void TickAttackCooldown()
+    {
         _coolDownTimer -= Time.deltaTime;
 
         if (_coolDownTimer >= 0f) return;
@@ -131,7 +144,11 @@ public abstract class UnitBase : MonoBehaviour, IGridPositioned, IDamageable
 
     public virtual void Init()
     {
-        if (_unitData != null) _currentHP = _unitData.maxHP;
+        if (_unitData != null)
+        {
+            _currentHP = _unitData.maxHP;
+            _currentStamina = _unitData.MaxStamina;
+        }
     }
 
     //Enemyの索敵
@@ -273,6 +290,48 @@ public abstract class UnitBase : MonoBehaviour, IGridPositioned, IDamageable
     {
         _facing = facing;
     }
+
+    private void TickStamina()
+    {
+        if (_gameTimeManager.CurrentTick - _lastStaminaTick >= _staminaInterval)
+        {
+            _lastStaminaTick = _gameTimeManager.CurrentTick;
+            StaminaDecrease(_staminaTimer);
+        }
+    }
+
+    /// <summary>
+    /// スタミナを減らす
+    /// </summary>
+    /// <param name="stamina"></param>
+    public void StaminaDecrease(float stamina)
+    {
+        _currentStamina -= stamina;
+        if (_currentStamina > _unitData.MaxStamina)
+        {
+            _currentStamina = _unitData.MaxStamina;
+        }
+
+        if(_currentStamina <= 0)
+        {
+            ForceRetreat();
+        }
+        Debug.Log(_currentStamina);
+    }
+
+    /// <summary>
+    /// スタミナを増加させる
+    /// </summary>
+    /// <param name="recoveryRate"></param>
+    public void StaminaRecovery(float recoveryRate)
+    {
+        _currentStamina += recoveryRate * Time.deltaTime;
+        if (_currentStamina > _unitData.MaxStamina)
+        {
+            _currentStamina = _unitData.MaxStamina;
+        }
+    }
+
 
     // デバッグ用：攻撃パターンを可視化。グリッドのXY→ワールドXZに対応していると仮定（1マス=1ワールド単位）。
     // 実際のグリッド軸の対応やセルサイズが違う場合はここを合わせて調整してください。

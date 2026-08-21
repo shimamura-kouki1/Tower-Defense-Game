@@ -49,7 +49,7 @@ public class DPManager : MonoBehaviour
     /// DPを加算していく
     /// </summary>
     /// <param name="amount"></param>
-    public void Add(int amount)
+    public void AddDP(int amount)
     {
         _currentDP += amount;
 
@@ -68,7 +68,7 @@ public class DPManager : MonoBehaviour
         if (_frameCounter >= _recoverFrame)
         {
             _frameCounter = 0;
-            Add(_recoverAmount);
+            AddDP(_recoverAmount);
         }
     }
 
